@@ -1,2 +1,4 @@
 **/__pycache__/
-/snet_cli/
+/snet_cli/*.py
+/snet_cli/_vendor
+/snet_cli/resources
