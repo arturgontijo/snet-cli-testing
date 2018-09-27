@@ -9,7 +9,6 @@ from snet_cli.commands import OrganizationCommand
 class OrganizationCommandTests(unittest.TestCase):
     def setUp(self):
         self.config = conf
-        self.args = None
         self.output_f = StringIO()
 
     def test_1_org_list(self):

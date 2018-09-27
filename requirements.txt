@@ -19,3 +19,4 @@ ecpy>=0.8.1
 pillow>=3.4.0
 python-u2flib-host>=3.0.2
 eth-tester==0.1.0b32
+containers==0.0.4

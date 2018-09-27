@@ -17,7 +17,7 @@ class IdentityTests(unittest.TestCase):
     def setUp(self):
         self.w3 = W3
         self.config = conf
-        self.args = None
+
         self.txn = {
             'gasPrice': 1,
             'nonce': 0,
