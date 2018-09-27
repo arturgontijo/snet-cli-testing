@@ -14,7 +14,7 @@ W3 = Web3(EthereumTesterProvider(EthereumTester(backend=MockBackend())))
 
 # Test: Identity types
 class IdentityTests(unittest.TestCase):
-    def _init(self):
+    def setUp(self):
         self.w3 = W3
         self.config = conf
         self.args = None
@@ -62,8 +62,6 @@ class IdentityTests(unittest.TestCase):
             return None
 
     def test_1_valid_key_id(self):
-        self._init()
-
         self.private_key = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
         test_id = self._get_id("key")
 
@@ -84,15 +82,11 @@ class IdentityTests(unittest.TestCase):
         self.assertEqual(block_number_1, block_number_2 - 1)
 
     def test_2_invalid_key_id(self):
-        self._init()
-
         self. private_key = "INVALID"
         test_id = self._get_id("key")
         self.assertEqual(test_id, None)
 
     def test_3_valid_mnemonic_id(self):
-        self._init()
-
         self.mnemonic = "gauge enact biology destroy normal tunnel slight slide wide sauce ladder produce"
         self.idx = 0
         test_id = self._get_id("mnemonic")
@@ -114,7 +108,6 @@ class IdentityTests(unittest.TestCase):
         self.assertEqual(block_number_1, block_number_2 - 1)
 
     def test_4_invalid_mnemonic_id(self):
-        self._init()
         self.mnemonic = 10
         test_id = self._get_id("mnemonic")
         self.assertEqual(test_id, None)

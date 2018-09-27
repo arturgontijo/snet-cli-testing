@@ -7,14 +7,12 @@ from snet_cli.commands import OrganizationCommand
 
 
 class OrganizationCommandTests(unittest.TestCase):
-    def init(self):
+    def setUp(self):
         self.config = conf
         self.args = None
         self.output_f = StringIO()
 
     def test_1_org_list(self):
-        self.init()
-
         argv = ["organization", "list"]
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
@@ -33,8 +31,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertGreaterEqual(len(response.split('\n')), 1)
 
     def test_2_org_info(self):
-        self.init()
-
         org_name = "SNET_BH"
         argv = ["organization", "info", org_name]
         parser = arguments.get_root_parser(self.config)
@@ -64,8 +60,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("Services:", response)
 
     def test_3_org_create(self):
-        self.init()
-
         no_confirm = "--no-confirm"
         gas_price_f = "--gas-price"
         gas_price = "1000000000"
@@ -95,8 +89,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("NEW_ORG_TEST already exists", response)
 
     def test_4_org_list_services(self):
-        self.init()
-
         org_name = "SNET_BH"
         argv = ["organization", "list-services", org_name]
         parser = arguments.get_root_parser(self.config)
@@ -116,8 +108,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertGreaterEqual(len(response.split('\n')), 1)
 
     def test_5_org_add_members(self):
-        self.init()
-
         no_confirm = "--no-confirm"
         gas_price_f = "--gas-price"
         gas_price = "1000000000"
@@ -143,8 +133,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("Creating transaction to add", response)
 
     def test_6_org_rem_members(self):
-        self.init()
-
         no_confirm = "--no-confirm"
         gas_price_f = "--gas-price"
         gas_price = "1000000000"
@@ -170,8 +158,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("Creating transaction to remove", response)
 
     def test_7_org_delete_existent(self):
-        self.init()
-
         no_confirm = "--no-confirm"
         gas_price_f = "--gas-price"
         gas_price = "1000000000"
@@ -194,8 +180,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("Creating transaction to delete organization NEW_ORG_TEST...", response)
 
     def test_8_org_delete_nonexistent(self):
-        self.init()
-
         no_confirm = "--no-confirm"
         gas_price_f = "--gas-price"
         gas_price = "1000000000"
@@ -217,8 +201,6 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("NEW_ORG_TEST doesn't exist!", response)
 
     def test_9_org_change_owner(self):
-        self.init()
-
         no_confirm = "--no-confirm"
         gas_price_f = "--gas-price"
         gas_price = "1000000000"
