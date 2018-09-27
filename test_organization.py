@@ -10,19 +10,21 @@ class OrganizationCommandTests(unittest.TestCase):
     def init(self):
         self.config = conf
         self.args = None
+        self.output_f = StringIO()
 
-    def test_org_list(self):
+    def test_1_org_list(self):
         self.init()
 
         argv = ["organization", "list"]
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
 
-        org_cmd = OrganizationCommand(self.config, args)
-        err = StringIO()
-        org_cmd.err_f = err
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        # List all registered Organizations
         org_cmd.list()
-        response = err.getvalue().strip()
+
+        response = self.output_f.getvalue().strip()
         # Response:
         # [0] List of Organizations:
         # [1] - ORG_NAME_1
@@ -30,7 +32,7 @@ class OrganizationCommandTests(unittest.TestCase):
         # [n] - ORG_NAME_n
         self.assertGreaterEqual(len(response.split('\n')), 1)
 
-    def test_org_info(self):
+    def test_2_org_info(self):
         self.init()
 
         org_name = "SNET_BH"
@@ -38,11 +40,12 @@ class OrganizationCommandTests(unittest.TestCase):
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
 
-        org_cmd = OrganizationCommand(self.config, args)
-        err = StringIO()
-        org_cmd.err_f = err
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        # Get information about an Organization
         org_cmd.info()
-        response = err.getvalue().strip()
+
+        response = self.output_f.getvalue().strip()
         # Response:
         # Owner:
         # - OWNER_ADDRESS
@@ -60,7 +63,7 @@ class OrganizationCommandTests(unittest.TestCase):
         self.assertIn("Members", response)
         self.assertIn("Services:", response)
 
-    def test_org_create(self):
+    def test_3_org_create(self):
         self.init()
 
         no_confirm = "--no-confirm"
@@ -78,73 +81,20 @@ class OrganizationCommandTests(unittest.TestCase):
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
 
-        org_cmd = OrganizationCommand(self.config, args)
-        org_cmd.err_f = None
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
         # Create NEW_ORG_TEST
         org_cmd.create()
 
-        err = StringIO()
-        org_cmd.err_f = err
         # Try to create NEW_ORG_TEST again
         org_cmd.create()
 
-        response = err.getvalue().strip()
+        response = self.output_f.getvalue().strip()
         # Response (org already exists):
         # [0] NEW_ORG_TEST already exists!
         self.assertIn("NEW_ORG_TEST already exists", response)
 
-    def test_org_delete_existent(self):
-        self.init()
-
-        no_confirm = "--no-confirm"
-        gas_price_f = "--gas-price"
-        gas_price = "1000000000"
-
-        org_name = "NEW_ORG_TEST"
-
-        argv = ["organization", "delete", no_confirm, gas_price_f, gas_price, org_name]
-        parser = arguments.get_root_parser(self.config)
-        args = parser.parse_args(argv)
-
-        org_cmd = OrganizationCommand(self.config, args)
-
-        err = StringIO()
-        org_cmd.err_f = err
-        # Delete NEW_ORG_TEST
-        org_cmd.delete()
-
-        response = err.getvalue().strip()
-        # Response:
-        # [0] Creating transaction to delete organization NEW_ORG_TEST...
-        # [1] Submitting transaction...
-        self.assertIn("Creating transaction to delete organization NEW_ORG_TEST...", response)
-
-    def test_org_delete_nonexistent(self):
-        self.init()
-
-        no_confirm = "--no-confirm"
-        gas_price_f = "--gas-price"
-        gas_price = "1000000000"
-
-        org_name = "NEW_ORG_TEST"
-
-        argv = ["organization", "delete", no_confirm, gas_price_f, gas_price, org_name]
-        parser = arguments.get_root_parser(self.config)
-        args = parser.parse_args(argv)
-
-        org_cmd = OrganizationCommand(self.config, args)
-
-        err = StringIO()
-        org_cmd.err_f = err
-        # Delete NEW_ORG_TEST
-        org_cmd.delete()
-
-        response = err.getvalue().strip()
-        # Response:
-        # [0] NEW_ORG_TEST doesn't exist!
-        self.assertIn("NEW_ORG_TEST doesn't exist!", response)
-
-    def test_org_list_services(self):
+    def test_4_org_list_services(self):
         self.init()
 
         org_name = "SNET_BH"
@@ -152,11 +102,12 @@ class OrganizationCommandTests(unittest.TestCase):
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
 
-        org_cmd = OrganizationCommand(self.config, args)
-        err = StringIO()
-        org_cmd.err_f = err
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        # List all organization's services
         org_cmd.list_services()
-        response = err.getvalue().strip()
+
+        response = self.output_f.getvalue().strip()
         # Response:
         # [0] List of ORG_NAME's Services:
         # [1] - SERVICE_NAME_1
@@ -164,34 +115,7 @@ class OrganizationCommandTests(unittest.TestCase):
         # [n] - SERVICE_NAME_n
         self.assertGreaterEqual(len(response.split('\n')), 1)
 
-    def test_org_change_owner(self):
-        self.init()
-
-        no_confirm = "--no-confirm"
-        gas_price_f = "--gas-price"
-        gas_price = "1000000000"
-
-        org_name = "NEW_ORG_TEST"
-
-        new_owner = "0x7fA3FBCFAc5c56367cB33821968Fc8c086199989"
-
-        argv = ["organization", "change-owner", no_confirm, gas_price_f, gas_price, org_name, new_owner]
-        parser = arguments.get_root_parser(self.config)
-        args = parser.parse_args(argv)
-
-        org_cmd = OrganizationCommand(self.config, args)
-
-        err = StringIO()
-        org_cmd.err_f = err
-        # Change owner of NEW_ORG_TEST
-        org_cmd.change_owner()
-
-        response = err.getvalue().strip()
-        # Response (org must exist):
-        # [0] Creating transaction to change organization NEW_ORG_TEST's owner...
-        self.assertIn("Creating transaction to change organization NEW_ORG_TEST's owner...", response)
-
-    def test_org_add_members(self):
+    def test_5_org_add_members(self):
         self.init()
 
         no_confirm = "--no-confirm"
@@ -208,19 +132,17 @@ class OrganizationCommandTests(unittest.TestCase):
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
 
-        org_cmd = OrganizationCommand(self.config, args)
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
 
-        err = StringIO()
-        org_cmd.err_f = err
         # Add members into NEW_ORG_TEST
         org_cmd.add_members()
 
-        response = err.getvalue().strip()
+        response = self.output_f.getvalue().strip()
         # Response (org must exists):
         # [0] Creating transaction to add [n] members into organization NEW_ORG_TEST...
         self.assertIn("Creating transaction to add", response)
 
-    def test_org_rem_members(self):
+    def test_6_org_rem_members(self):
         self.init()
 
         no_confirm = "--no-confirm"
@@ -229,25 +151,98 @@ class OrganizationCommandTests(unittest.TestCase):
 
         org_name = "NEW_ORG_TEST"
 
-        member_1 = "0x4444444444444444444444444444444444444444"
-        member_2 = "0x5555555555555555555555555555555555555555"
+        member_1 = "0x2222222222222222222222222222222222222222"
+        member_2 = "0x3333333333333333333333333333333333333333"
         members = "{},{}".format(member_1, member_2)
 
         argv = ["organization", "rem-members", no_confirm, gas_price_f, gas_price, org_name, members]
         parser = arguments.get_root_parser(self.config)
         args = parser.parse_args(argv)
 
-        org_cmd = OrganizationCommand(self.config, args)
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
 
-        err = StringIO()
-        org_cmd.err_f = err
         # Remove members from NEW_ORG_TEST
         org_cmd.rem_members()
 
-        response = err.getvalue().strip()
+        response = self.output_f.getvalue().strip()
         # Response (org must exists):
         # [0] Creating transaction to remove [n] members from organization NEW_ORG_TEST...
         self.assertIn("Creating transaction to remove", response)
+
+    def test_7_org_delete_existent(self):
+        self.init()
+
+        no_confirm = "--no-confirm"
+        gas_price_f = "--gas-price"
+        gas_price = "1000000000"
+
+        org_name = "NEW_ORG_TEST"
+
+        argv = ["organization", "delete", no_confirm, gas_price_f, gas_price, org_name]
+        parser = arguments.get_root_parser(self.config)
+        args = parser.parse_args(argv)
+
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        # Delete NEW_ORG_TEST
+        org_cmd.delete()
+
+        response = self.output_f.getvalue().strip()
+        # Response:
+        # [0] Creating transaction to delete organization NEW_ORG_TEST...
+        # [1] Submitting transaction...
+        self.assertIn("Creating transaction to delete organization NEW_ORG_TEST...", response)
+
+    def test_8_org_delete_nonexistent(self):
+        self.init()
+
+        no_confirm = "--no-confirm"
+        gas_price_f = "--gas-price"
+        gas_price = "1000000000"
+
+        org_name = "NEW_ORG_TEST"
+
+        argv = ["organization", "delete", no_confirm, gas_price_f, gas_price, org_name]
+        parser = arguments.get_root_parser(self.config)
+        args = parser.parse_args(argv)
+
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        # Delete NEW_ORG_TEST
+        org_cmd.delete()
+
+        response = self.output_f.getvalue().strip()
+        # Response:
+        # [0] NEW_ORG_TEST doesn't exist!
+        self.assertIn("NEW_ORG_TEST doesn't exist!", response)
+
+    def test_9_org_change_owner(self):
+        self.init()
+
+        no_confirm = "--no-confirm"
+        gas_price_f = "--gas-price"
+        gas_price = "1000000000"
+
+        org_name = "NEW_ORG_TEST"
+
+        new_owner = "0x7fA3FBCFAc5c56367cB33821968Fc8c086199989"
+
+        argv = ["organization", "change-owner", no_confirm, gas_price_f, gas_price, org_name, new_owner]
+        parser = arguments.get_root_parser(self.config)
+        args = parser.parse_args(argv)
+
+        org_cmd = OrganizationCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        # Change owner of NEW_ORG_TEST (doesn't exist anymore...)
+        # If you change the NEW_ORG_TEST's owner you'll have to change your
+        # session private_key (new owner) to keep interacting with it.
+        org_cmd.change_owner()
+
+        response = self.output_f.getvalue().strip()
+        # Response (org must exist):
+        # [0] Creating transaction to change organization NEW_ORG_TEST's owner...
+        # [-] But: NEW_ORG_TEST doesn't exist!
+        self.assertIn("NEW_ORG_TEST doesn't exist!", response)
 
 
 if __name__ == '__main__':
