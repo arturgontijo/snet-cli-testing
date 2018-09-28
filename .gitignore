@@ -3,3 +3,5 @@
 /snet_cli/*.py
 /snet_cli/_vendor
 /snet_cli/resources
+/snet-cli/*
+!/.gitignore

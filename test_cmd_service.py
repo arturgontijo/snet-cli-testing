@@ -20,7 +20,7 @@ class ServiceCommandTests(unittest.TestCase):
 
         service_cmd = ServiceCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
 
-        # Show session keys
+        # Init (create) a new service json file
         service_cmd.init()
 
         response = self.output_f.getvalue().strip()
@@ -37,6 +37,24 @@ class ServiceCommandTests(unittest.TestCase):
         #         "description": ""
         #     }
         # }
+        self.assertIn("name", response)
+        self.assertIn("service_spec", response)
+        self.assertIn("organization", response)
+
+    def test_2_service_publish(self):
+        argv = ["service", "publish"]
+        parser = arguments.get_root_parser(self.config)
+        args = parser.parse_args(argv)
+
+        service_cmd = ServiceCommand(self.config, args, out_f=self.output_f, err_f=self.output_f)
+
+        os.mak
+        # Show session keys
+        service_cmd.publish()
+
+        response = self.output_f.getvalue().strip()
+        # Response:
+        #
         self.assertGreaterEqual(len(response.split("\n")), 1)
 
 
